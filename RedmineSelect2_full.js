@@ -1,14 +1,17 @@
 // ==UserScript==
 // @name         Redmine 下拉 select2
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  RedMine支持检索功能-能拼音检索
 // @author       You
-// @include      https://redmine.yanwuting.cn/*
+// @note         修复支持多选框
+// @include      https://redmine.yanwu*.cn/*
 // @require      https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
-// @require      https://greasyfork.org/scripts/433916-select2-pinyin/code/Select2_pinyin.js?version=979267
-// @grant        none
-// @run-at       document-end
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
+// @resource     select2JS https://greasyfork.org/scripts/433916-select2-pinyin/code/Select2_pinyin.js?version=979267
+// @run-at       document-start
+// @license MIT
 // ==/UserScript==
 
 (function() {
@@ -482,13 +485,47 @@
 })();
 (function() {
     'use strict';
+    function safeWaitFunc(selector, timeout) {
+        return new Promise((resolve, reject) => {
+            const int_id = setInterval(() => {
+                const nodes = document.querySelectorAll(selector);
+                if(nodes.length) {
+                    resolve(nodes);
+                    clearInterval(int_id);
+                }
+                timeout && setTimeout(() => {
+                    clearInterval(int_id);
+                    reject('超时')
+                }, timeout)
+            }, 50)
+        })
+    }
+
+    function insertSelect2() {
+        // let insScriptNode = document.createElement('script')
+        // insScriptNode.type = 'text/javascript'
+        // insScriptNode.innerHTML = GM_getResourceText('select2JS')
+        // document.head.appendChild(insScriptNode);
+
+        eval(GM_getResourceText('select2JS'))
+    }
+
+    safeWaitFunc('.toggle-multiselect', 1000).then(nodes => {
+        nodes.forEach(one => one.click());
+        insertSelect2();
+    }, err => {
+        insertSelect2();
+    })
 
     setInterval(() => {
         $('select').not('.select2-hidden-accessible').select2({ width: '100%' });
     }, 2000)
+
     var cssNode = document.createElement('link')
     cssNode.rel = "stylesheet"
     cssNode.href = 'https://cdn.staticfile.org/select2/4.0.9/css/select2.css'
+
+    GM_addStyle('.contextual{ min-width: 150px; margin-right: 50px; }')
 
     document.head.appendChild(cssNode)
 })();

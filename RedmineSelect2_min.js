@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  RedMine支持检索功能-能拼音检索
 // @author       You
-// @include      https://redmine.yanwuting.cn/*
+// @include      https://redmine.yanwu*.cn/*
 // @require      https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
 // @require      https://greasyfork.org/scripts/433916-select2-pinyin/code/Select2_pinyin.js?version=979267
 // @grant        none
